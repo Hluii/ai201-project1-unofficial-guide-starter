@@ -10,6 +10,9 @@
 ## Domain
 
 <!-- What domain did you choose? Why is this knowledge valuable and hard to find through official channels? -->
+Student Reviews of Computer Science professors from SFSU. Using Rate My Professors as a source. 
+
+Valuable because this knowledge needs personal and up-to-date annecdotes, which is scattered and not conviently searchable.
 
 ---
 
@@ -20,16 +23,16 @@
 
 | # | Source | Description | URL or location |
 |---|--------|-------------|-----------------|
-| 1 | | | |
-| 2 | | | |
-| 3 | | | |
-| 4 | | | |
-| 5 | | | |
-| 6 | | | |
-| 7 | | | |
-| 8 | | | |
-| 9 | | | |
-| 10 | | | |
+| 1 |Rate My Professors|Anagha Kulkarni|https://www.ratemyprofessors.com/professor/1840168|
+| 2 |Rate My Professors|Daniel Tomasevich|https://www.ratemyprofessors.com/professor/727048|
+| 3 |Rate My Professors|Kaz Okada|https://www.ratemyprofessors.com/professor/940009|
+| 4 |Rate My Professors|Robert Bierman|https://www.ratemyprofessors.com/professor/2546440|
+| 5 |Rate My Professors|Anthony Souza|https://www.ratemyprofessors.com/professor/1941294|
+| 6 |Rate My Professors|Hui Yang|https://www.ratemyprofessors.com/professor/954738|
+| 7 |Rate My Professors|Duc Ta|https://www.ratemyprofessors.com/professor/2316592|
+| 8 |Rate My Professors|Jose Ortiz-Costa|https://www.ratemyprofessors.com/professor/2546744|
+| 9 |Rate My Professors|John Roberts|https://www.ratemyprofessors.com/professor/1792558|
+| 10 |Rate My Professors|Matt Pico|https://www.ratemyprofessors.com/professor/2069175|
 
 ---
 
@@ -41,10 +44,13 @@
      A review-heavy corpus warrants different chunking than a long FAQ. -->
 
 **Chunk size:**
+350 characters
 
 **Overlap:**
+50 characters
 
 **Reasoning:**
+Short reviews typical point to small chunks to keep precision high.Max charcter count on rate my professor is 350.
 
 ---
 
@@ -57,10 +63,13 @@
      support, accuracy on domain-specific text, latency? -->
 
 **Embedding model:**
+all-MiniLM-L6-v2
 
 **Top-k:**
+5
 
 **Production tradeoff reflection:**
+I am using a model taht can be run locally and is cheap right now. If I wasn't constrained by cost I would use paid options like OpenAI due to better accuracy. Also, since all the CS classes at SFSU are taught in english, multilingual support wouldn't be highly valued for me.
 
 ---
 
