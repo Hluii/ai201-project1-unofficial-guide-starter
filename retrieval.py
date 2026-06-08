@@ -109,16 +109,43 @@ def embed_and_store(chunks):
     return collection
 
 
-def retrieve(query, k=5, cutoff=0.5):
+def _build_where(professor=None, course=None, min_year=None):
+    """Build a ChromaDB ``where`` filter from optional metadata constraints.
+
+    Returns ``None`` when no constraints are given, a single-condition dict for
+    one constraint, or an ``$and`` of conditions for several.
+    """
+    conditions = []
+    if professor:
+        conditions.append({"professor_name": {"$eq": professor}})
+    if course:
+        conditions.append({"course": {"$eq": course}})
+    if min_year:
+        conditions.append({"year": {"$gte": int(min_year)}})
+    if not conditions:
+        return None
+    if len(conditions) == 1:
+        return conditions[0]
+    return {"$and": conditions}
+
+
+def retrieve(query, k=5, cutoff=0.5, professor=None, course=None, min_year=None):
     """Retrieve the top-k chunks most similar to ``query`` within a distance cutoff.
 
     Embeds the query with the same model, searches ChromaDB for the ``k`` nearest
     chunks, then drops any whose cosine distance exceeds ``cutoff``.
 
+    Optional metadata filters (``professor``, ``course``, ``min_year``) are applied
+    via ChromaDB's ``where`` clause *before* the nearest-neighbour search, so they
+    change which chunks are eligible to be returned at all -- not a post-hoc trim.
+
     Args:
         query: Natural-language query string.
         k: Number of nearest neighbors to fetch before filtering.
         cutoff: Maximum cosine distance to keep (smaller == more similar).
+        professor: If set, restrict to chunks whose ``professor_name`` matches exactly.
+        course: If set, restrict to chunks whose ``course`` matches exactly (e.g. "CSC 340").
+        min_year: If set, restrict to reviews whose ``year`` is >= this value.
 
     Returns:
         A list of dicts (closest first), each with ``id``, ``text``,
@@ -127,11 +154,15 @@ def retrieve(query, k=5, cutoff=0.5):
     collection = _get_client().get_collection(COLLECTION_NAME)
     query_embedding = _embed([query])[0]
 
-    result = collection.query(
-        query_embeddings=[query_embedding],
-        n_results=k,
-        include=["documents", "metadatas", "distances"],
-    )
+    where = _build_where(professor=professor, course=course, min_year=min_year)
+    query_kwargs = {
+        "query_embeddings": [query_embedding],
+        "n_results": k,
+        "include": ["documents", "metadatas", "distances"],
+    }
+    if where is not None:
+        query_kwargs["where"] = where
+    result = collection.query(**query_kwargs)
 
     hits = []
     for id_, document, metadata, distance in zip(

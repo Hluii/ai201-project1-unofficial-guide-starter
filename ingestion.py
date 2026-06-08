@@ -94,6 +94,17 @@ _ICON_PREFIX_RE = re.compile(r"^computer icon", re.IGNORECASE)
 _COURSE_CODE_RE = re.compile(r"(?:CSC|CS)?0*(\d{3})")
 UNKNOWN_COURSE = "Unknown"
 
+# Year pulled from a review date line like "Apr 26th, 2026" -> 2026. Stored as an
+# int in chunk metadata so retrieval can filter by recency (e.g. year >= 2020).
+# 0 when the date carries no 4-digit year.
+_YEAR_RE = re.compile(r"\b(?:19|20)\d{2}\b")
+
+
+def _year_from_date(date_str):
+    """Extract the 4-digit year from a date string ('Apr 26th, 2026' -> 2026)."""
+    match = _YEAR_RE.search(date_str or "")
+    return int(match.group(0)) if match else 0
+
 
 def _professor_name_from_filename(filename):
     """Derive a display name from a file name: 'Matt_Pico_rmp.txt' -> 'Matt Pico'."""
@@ -297,6 +308,7 @@ def chunk_document(records, chunk_size=350, overlap=50):
                         "professor_name": record["professor_name"],
                         "course": record["course"],
                         "date": record["date"],
+                        "year": _year_from_date(record["date"]),
                         "source": SOURCE,
                         "filename": filename,
                     },

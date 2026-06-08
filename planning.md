@@ -50,7 +50,7 @@ Valuable because this knowledge needs personal and up-to-date anecdotes, which a
 50 characters
 
 **Reasoning:**
-Short reviews typically point to small chunks to keep precision high. Max character count on RateMyProfessor is 350. All professors in 10 document dataset have 10+ reviews.
+Short reviews typically point to small chunks to keep precision high. Max character count on RateMyProfessor is 350. All professors in 10-document dataset have 10+ reviews.
 
 ---
 
@@ -84,8 +84,8 @@ I am using a model that can be run locally and is cheap right now. If I wasn't c
 |---|----------|-----------------|
 | 1 |Is Professor Anagha Kulkarni recommended for students who need a lot of in-class support?|No — reviews say she is unhelpful with questions, has confusing slides, and students must learn independently.|
 | 2 |What happens if you miss too many classes in Robert Bierman's course?|You automatically fail if you miss 5 or more classes.|
-| 3 | What is Daniel Tomasevich's class known for?|Easy class with boring, monotonous lectures that read straight from a script. Quizzes are argumentative rather than right/wrong.|
-| 4 |Are John Roberts' assignments considered clear and fair?|No — assignments frequently contain unintentional mistakes, are unclear, and a low percentage of students pass.|
+| 3 | What is Daniel Tomasevich's class known for?|Easy class with boring, monotonous lectures. Quizzes are argumentative rather than right/wrong.|
+| 4 |Are John Roberts' assignments considered clear and fair?|No — assignments frequently contain mistakes he fixes in-class, are unclear, and are extremely time-consuming.|
 | 5 |Which SFSU CS professor is best for students who want a lot of support and grade opportunities?|Duc Ta — reviewers consistently describe him as caring, patient, and offering many grade-boosting opportunities with no mandatory attendance and zero cost materials.|
 
 ---
@@ -128,10 +128,19 @@ I am using a model that can be run locally and is cheap right now. If I wasn't c
      Ask Claude Code to help me set up file structure and leave functions like a fill-in-the-blank(To promote learning).
 
 **Milestone 3 — Ingestion and chunking:**
-I will give Claude Code my planning.md, architecture diagram, documents folder, and notes I have for how to clean the data(including structure to clean the raw txt and output to) and ask it to implement ingesting on text from /documents(load_document()) and clean each review into `Course, Review, Date`(clean_document). Then verify the input is cleaned; Then chunk according to my chunk size and overlap(chunk_document()). Returning chunks containing documents(raw text strings), metadata(Course, Professor Name, Source = `RateMyProfessor`, file name, and Date) and ids(unique chunk id). Then I will review a small sample size of chunks for quality and check the number of chunks against the size of input. Giving my feedback to Claude for improvement before moving on. 
+I will give Claude Code my planning.md, architecture diagram, documents folder, and notes I have for how to clean the data(including structure to clean the raw txt and output to) and ask it to implement ingesting on text from /documents(load_document()) and clean each review into `Course, Review, Date`(clean_document). Then verify the input is cleaned; then chunk according to my chunk size and overlap(chunk_document()). Returning chunks containing documents(raw text strings), metadata(Course, Professor Name, Source = `RateMyProfessor`, file name, and Date) and ids(unique chunk id). Then I will review a small sample size of chunks for quality and check the number of chunks against the size of input. Giving my feedback to Claude for improvement before moving on. 
 
 **Milestone 4 — Embedding and retrieval:**
-I will give Claude Code my retrieval section of planning.md and architecture diagram and tell it to use the embedding model(all-MiniLM-L6-v2) and implement embed_and_store() to embed all chunks from chunk_document() to ChromaDB. Then using top-k to implement retrieve(query, top-k) using a cut-off of `.5` for distance to return top-k chunks of closest distance to the query under the cutoff. Then test retrievals accuracy based on my example questions and have claude consult me on debugging.
+I will give Claude Code my retrieval section of planning.md and architecture diagram and tell it to use the embedding model(all-MiniLM-L6-v2) and implement embed_and_store() to embed all chunks from chunk_document() to ChromaDB. Then using top-k to implement retrieve(query, top-k) using a cut-off of `.5` for distance to return top-k chunks of closest distance to the query under the cutoff. Then test retrievals accuracy based on my example questions and have Claude consult me on debugging.
 
 **Milestone 5 — Generation and interface:**
- I will tell Claude to implement generate_response(query, retrieve_chunks(from retrieve())). The function will return "Insufficient data" when retrieve_chunks = [], only uses retrieve context(not trained knowledge), and attribute source(`RateMyProfessor`) and the `file name` from metadata. Then I will check for utilization of source material and implement UI with Gradio; Utilizing Claude Code for debugging.
+ I will tell Claude to implement generate_response(query, retrieve_chunks(from retrieve())). The function will return "Insufficient data" when retrieve_chunks = [], only uses retrieved context(not trained knowledge), and attribute the source(`RateMyProfessor` and `file name` from metadata). Then I will check for utilization of source material and implement UI with Gradio; Utilizing Claude Code for debugging.
+
+---
+
+## Stretch Features
+
+<!-- Update before starting each stretch feature. -->
+
+**Metadata Filtering (in progress):**
+Each chunk already stores `professor_name`, `course`, `date`, `source`, and `filename`. I will add a parsed integer `year` to the metadata so reviews can be filtered by recency, then extend `retrieve()` with optional `professor`, `course`, and `min_year` filters applied through ChromaDB's `where` clause *before* the similarity search (so the filter changes which chunks are eligible, not just a post-hoc trim). The Gradio UI will expose a professor dropdown and a "reviews from year ≥" input. This targets Anticipated Challenge #2 — old, lower-division reviews skewing answers — by letting a user restrict results to recent reviews.
