@@ -12,7 +12,7 @@
 <!-- What domain did you choose? Why is this knowledge valuable and hard to find through official channels? -->
 Student Reviews of Computer Science professors from SFSU. Using Rate My Professors as a source. 
 
-Valuable because this knowledge needs personal and up-to-date annecdotes, which is scattered and not conviently searchable.
+Valuable because this knowledge needs personal and up-to-date anecdotes, which are scattered and not conveniently searchable.
 
 ---
 
@@ -50,7 +50,7 @@ Valuable because this knowledge needs personal and up-to-date annecdotes, which 
 50 characters
 
 **Reasoning:**
-Short reviews typical point to small chunks to keep precision high.Max charcter count on rate my professor is 350.
+Short reviews typically point to small chunks to keep precision high. Max character count on RateMyProfessor is 350. All professors in 10 document dataset have 10+ reviews.
 
 ---
 
@@ -69,7 +69,7 @@ all-MiniLM-L6-v2
 5
 
 **Production tradeoff reflection:**
-I am using a model taht can be run locally and is cheap right now. If I wasn't constrained by cost I would use paid options like OpenAI due to better accuracy. Also, since all the CS classes at SFSU are taught in english, multilingual support wouldn't be highly valued for me.
+I am using a model that can be run locally and is cheap right now. If I wasn't constrained by cost I would use paid options like OpenAI due to better accuracy. Also, since all the CS classes at SFSU are taught in English, multilingual support wouldn't be highly valued for me.
 
 ---
 
@@ -82,11 +82,11 @@ I am using a model taht can be run locally and is cheap right now. If I wasn't c
 
 | # | Question | Expected answer |
 |---|----------|-----------------|
-| 1 | | |
-| 2 | | |
-| 3 | | |
-| 4 | | |
-| 5 | | |
+| 1 |Is Professor Anagha Kulkarni recommended for students who need a lot of in-class support?|No — reviews say she is unhelpful with questions, has confusing slides, and students must learn independently.|
+| 2 |What happens if you miss too many classes in Robert Bierman's course?|You automatically fail if you miss 5 or more classes.|
+| 3 | What is Daniel Tomasevich's class known for?|Easy class with boring, monotonous lectures that read straight from a script. Quizzes are argumentative rather than right/wrong.|
+| 4 |Are John Roberts' assignments considered clear and fair?|No — assignments frequently contain unintentional mistakes, are unclear, and a low percentage of students pass.|
+| 5 |Which SFSU CS professor is best for students who want a lot of support and grade opportunities?|Duc Ta — reviewers consistently describe him as caring, patient, and offering many grade-boosting opportunities with no mandatory attendance and zero cost materials.|
 
 ---
 
@@ -96,14 +96,16 @@ I am using a model taht can be run locally and is cheap right now. If I wasn't c
      Consider: noisy or inconsistent documents, missing source attribution, off-topic
      retrieval, chunks that split key information across boundaries. -->
 
-1.
+1. Inconsistent source information, because the source `RateMyProfessor` is a self-reported and biased dataset, the information may often conflict, leading to a confusing output `e.g. "___ is a great professor, they only lecture and are unreachable outside of class"`.
 
-2.
+2. Noisy documents, responses may be "Inaccurate" if not taking into consideration date and Course. `e.g. "___ is terrible since they don't explain simple concepts well", when in reality these may be reviews for classes taught 10 years ago that are lower-division when the professor now teaches only upper division classes that get good reviews`.
 
 ---
 
 ## Architecture
-
+![alt text](<Document Ingestion Flow to-2026-06-08-022244.png>)
+     
+     Document Ingestion(Clean) → Chunking(350 char chunk, 50 char Overlap) → Embedding(all-MiniLM-L6-v2) + Vector Store(ChromaDB) → Retrieval(top-k = 5) → Generation(Groq LLM)
 <!-- Draw a diagram of your pipeline showing the five stages:
      Document Ingestion → Chunking → Embedding + Vector Store → Retrieval → Generation
      Label each stage with the tool or library you're using.
@@ -123,9 +125,13 @@ I am using a model taht can be run locally and is cheap right now. If I wasn't c
      "I'll use AI to help me code" is not a plan.
      "I'll give Claude my Chunking Strategy section and ask it to implement chunk_text()
      with my specified chunk size and overlap" is a plan. -->
+     Ask Claude Code to help me set up file structure and leave functions like a fill-in-the-blank(To promote learning).
 
 **Milestone 3 — Ingestion and chunking:**
+I will give Claude Code my planning.md, architecture diagram, documents folder, and notes I have for how to clean the data(including structure to clean the raw txt and output to) and ask it to implement ingesting on text from /documents(load_document()) and clean each review into `Course, Review, Date`(clean_document). Then verify the input is cleaned; Then chunk according to my chunk size and overlap(chunk_document()). Returning chunks containing documents(raw text strings), metadata(Course, Professor Name, Source = `RateMyProfessor`, file name, and Date) and ids(unique chunk id). Then I will review a small sample size of chunks for quality and check the number of chunks against the size of input. Giving my feedback to Claude for improvement before moving on. 
 
 **Milestone 4 — Embedding and retrieval:**
+I will give Claude Code my retrieval section of planning.md and architecture diagram and tell it to use the embedding model(all-MiniLM-L6-v2) and implement embed_and_store() to embed all chunks from chunk_document() to ChromaDB. Then using top-k to implement retrieve(query, top-k) using a cut-off of `.5` for distance to return top-k chunks of closest distance to the query under the cutoff. Then test retrievals accuracy based on my example questions and have claude consult me on debugging.
 
 **Milestone 5 — Generation and interface:**
+ I will tell Claude to implement generate_response(query, retrieve_chunks(from retrieve())). The function will return "Insufficient data" when retrieve_chunks = [], only uses retrieve context(not trained knowledge), and attribute source(`RateMyProfessor`) and the `file name` from metadata. Then I will check for utilization of source material and implement UI with Gradio; Utilizing Claude Code for debugging.
