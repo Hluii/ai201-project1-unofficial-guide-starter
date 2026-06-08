@@ -1,6 +1,21 @@
-# The Unofficial Guide — Project 1
+# The Unofficial Guide — SFSU CS Professors
 
-**Demo:**[App Demo](https://github.com/Hluii/ai201-project1-unofficial-guide-starter/blob/main/DEMOred.mp4)
+> "Colleges have two kinds of knowledge: the official kind, and the real kind."
+
+A Retrieval-Augmented Generation (RAG) system that makes student reviews of 
+SFSU Computer Science professors searchable through natural language. Instead 
+of manually browsing Rate My Professors for each professor one by one, ask a 
+single question and get a grounded, cited answer drawn directly from real 
+student reviews.
+
+**Example queries:**
+- "Which CS professor is best for students who need a lot of support?"
+- "Are John Roberts' assignments clear and fair?"
+- "What is Duc Ta's class known for?"
+
+Built with: `sentence-transformers` · `ChromaDB` · `Groq (LLaMA 3.3 70B)` · `Gradio`
+
+**Demo:** [App Demo](https://github.com/Hluii/ai201-project1-unofficial-guide-starter/blob/main/DEMOred.mp4)
 
 ![App Demo](https://github.com/Hluii/ai201-project1-unofficial-guide-starter/blob/main/DEMOred.gif)
 
@@ -12,14 +27,37 @@
      Why is this knowledge valuable, and why is it hard to find through official channels?
      Example: "Student reviews of CS professors at [university] — useful because official
      course descriptions don't reflect teaching style, exam difficulty, or workload." -->
-Student Reviews of Computer Science professors from SFSU. Using Rate My Professors as a source. 
+Student reviews of Computer Science professors at San Francisco State University (SFSU), 
+sourced from Rate My Professors.
 
-Valuable because this knowledge needs personal and up-to-date anecdotes, which are scattered and not conveniently searchable.
+This knowledge is valuable because official university channels — course catalogs, 
+syllabi, and department websites — describe what a class covers but not what it is 
+actually like to take it. Information like whether a professor's exams are fair, how 
+responsive they are to student questions, or whether attendance is strictly enforced 
+only exists in student-generated reviews scattered across individual professor pages. 
+Finding it requires manually searching each professor one by one and reading through 
+dozens of reviews. This system makes that knowledge queryable in plain language across 
+all professors at once.
 
+
+## Setup
+
+>`pip install -r requirements.txt`
+
+## Project Structure
+```text
+project/
+├── documents/        # Raw professor review files (10 professors)
+├── ingestion.py      # Document loading, cleaning, chunking
+├── retrieval.py      # Embedding and vector store retrieval
+├── generation.py     # Grounded response generation via Groq
+├── app.py            # Gradio web interface
+├── planning.md       # Spec written before implementation
+├── README.md
+├── requirements.txt
+```
 ---
-
 ## Document Sources
-
 <!-- List every source you collected documents from.
      Be specific: include URLs, subreddit names, forum thread titles, or file names.
      Aim for variety — sources that together cover different subtopics or perspectives. -->
@@ -38,6 +76,8 @@ Valuable because this knowledge needs personal and up-to-date anecdotes, which a
 | 10 |Rate My Professors|Matt Pico|https://www.ratemyprofessors.com/professor/2069175|
 
 ---
+
+
 
 ## Chunking Strategy
 
