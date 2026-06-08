@@ -1,9 +1,8 @@
 # The Unofficial Guide — Project 1
 
-> **How to use this template:**
-> Complete each section *after* you've built and tested the corresponding part of your system.
-> Do not write placeholder text — if a section isn't done yet, leave it blank and come back.
-> Every section below is required for submission. One-liners will not receive full credit.
+**Demo:**[App Demo](https://github.com/Hluii/ai201-project1-unofficial-guide-starter/blob/main/DEMOred.mp4)
+
+![App Demo](https://github.com/Hluii/ai201-project1-unofficial-guide-starter/blob/main/DEMOred.gif)
 
 ---
 
